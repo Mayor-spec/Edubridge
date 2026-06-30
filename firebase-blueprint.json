@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "SprintRecord": {
+      "title": "SprintRecord",
+      "description": "A student study sprint performance record",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the student"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email address of the student"
+        },
+        "notesTopic": {
+          "type": "string",
+          "description": "Topic or title of the study notes"
+        },
+        "scorePoints": {
+          "type": "number",
+          "description": "Number of correct answers on the quiz"
+        },
+        "totalMetricsCount": {
+          "type": "number",
+          "description": "Total number of questions in the quiz"
+        },
+        "accuracyPercentage": {
+          "type": "number",
+          "description": "Percentage accuracy of the quiz score"
+        },
+        "rawWorkspacePayload": {
+          "type": "object",
+          "description": "Full study sprint payload containing flashcards, mnemonics, and quiz questions with user responses"
+        },
+        "loggedTimestamp": {
+          "type": "object",
+          "format": "date-time",
+          "description": "Firestore server timestamp of when the record was logged"
+        }
+      },
+      "required": [
+        "userId",
+        "userEmail",
+        "notesTopic",
+        "scorePoints",
+        "totalMetricsCount",
+        "accuracyPercentage",
+        "rawWorkspacePayload",
+        "loggedTimestamp"
+      ]
+    }
+  },
+  "firestore": {
+    "student_performance_records/{recordId}": {
+      "schema": "SprintRecord",
+      "description": "Collection of student study sprint history logs"
+    }
+  }
+}

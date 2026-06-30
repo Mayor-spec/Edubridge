@@ -1,0 +1,6 @@
+{
+  "name": "EduBridge AI",
+  "description": "Interactive study dashboard featuring lecture file parsing, AI-generated concept flashcards, acronym mnemonics, and active sprint quizzes with custom progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

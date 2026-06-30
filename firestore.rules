@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // SprintRecord validation
+    function isValidSprintRecord(data) {
+      return data.keys().hasAll(['userId', 'userEmail', 'notesTopic', 'scorePoints', 'totalMetricsCount', 'accuracyPercentage', 'rawWorkspacePayload', 'loggedTimestamp'])
+        && data.keys().size() == 8
+        && data.userId is string
+        && data.userId.size() <= 128
+        && data.userEmail is string
+        && data.userEmail.size() <= 256
+        && data.notesTopic is string
+        && data.notesTopic.size() <= 500
+        && (data.scorePoints is int || data.scorePoints is float)
+        && data.scorePoints >= 0
+        && (data.totalMetricsCount is int || data.totalMetricsCount is float)
+        && data.totalMetricsCount >= 0
+        && (data.accuracyPercentage is int || data.accuracyPercentage is float)
+        && data.accuracyPercentage >= 0
+        && data.rawWorkspacePayload is map
+        && (data.loggedTimestamp is timestamp || data.loggedTimestamp == request.time);
+    }
+
+    match /student_performance_records/{recordId} {
+      allow create: if isSignedIn()
+        && isValidId(recordId)
+        && isValidSprintRecord(incoming())
+        && isOwner(incoming().userId);
+
+      allow update: if isSignedIn()
+        && isValidId(recordId)
+        && isValidSprintRecord(incoming())
+        && isOwner(existing().userId)
+        && isOwner(incoming().userId);
+
+      allow get: if isSignedIn()
+        && isValidId(recordId)
+        && isOwner(existing().userId);
+
+      allow list: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+  }
+}
